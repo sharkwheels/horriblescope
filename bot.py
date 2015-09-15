@@ -1,4 +1,4 @@
-## This file should run on a worker on heroku, maybe...?
+### IMPORTS  #########################################################################
 
 ### sys stuff ###
 import random, sys, json, datetime, re, os, unicodedata
@@ -57,15 +57,20 @@ except psycopg2.DatabaseError, e:
 		con.rollback()
 	print 'Error %s' % e
 
+### HORRORSCOPE IDLE (Every Hour on Scheduler) ##########################################################
 
+def timedTweet():
+	cur.execute("SELECT * FROM Idle ORDER BY RANDOM() LIMIT 1;")
+	rows = cur.fetchall()
+	timedR = rows[0][1]
+	try:
+		twitter.update_status(status=timedR)
+		print timedR
+	except TwythonError as e:
+		print e
+
+	
 ### HORRORSCOPE RESPONSE STREAM ##########################################################
-
-### NEED AN IDLE MODE ###
-
-# idle mode tweets every hour
-# just something silly
-
-### not sure if this will work on heroku as is ###
 
 class oracleStream(TwythonStreamer):
 
@@ -83,6 +88,7 @@ class oracleStream(TwythonStreamer):
 		print fetchedD
 		return fetchedD
 
+
 	def on_success(self, data): 
 
 		if 'text' in data:
@@ -97,23 +103,29 @@ class oracleStream(TwythonStreamer):
 				sign = '' 
 				for s in signs:
 					if s in body:
-						sign = s
-				toTweet = ".@%s: %s #%s" % (user, reading, sign)
+						sign = '#%s' % s
+				toTweet = ".@%s: %s %s" % (user, reading, sign)
+				print toTweet
+				
 				try:
 					twitter.update_status(status=toTweet)
 				except TwythonError as e:
 					print e
+				
 			else:
 				defR = self.oracleDefers()
 				toNope = ".@%s: %s" % (user, defR)
+				print toNope
+				
 				try:
 					twitter.update_status(status=toNope)
 				except TwythonError as e:
 					print e
+				
 					
 	def on_error(self, status_code, data):
 		#print status_code
 		pass
 
 OrcStream = oracleStream(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-OrcStream.statuses.filter(track='@horrible_scope') 
+OrcStream.statuses.filter(track='@horrible_scope') #only works if you are public

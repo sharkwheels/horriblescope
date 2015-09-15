@@ -14,13 +14,11 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 @app.route("/",methods=['GET','POST'])
 
 def main():
-	# maybe I'll make a "X number of people served"
-	# display the latest tweet or something
-	# a little about this tiny app
 	return render_template('main.html')
 	
 
 ### RUN IT ####################################################################
 
 if __name__ == '__main__': # If we're executing this app from the command line
-    app.run("127.0.0.1", port = 3000, debug=True, use_reloader=False)
+    #app.run("127.0.0.1", port = 3000, debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=False)
