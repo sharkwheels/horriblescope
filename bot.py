@@ -1,3 +1,4 @@
+## This file should run on a worker on heroku, maybe...?
 
 ### sys stuff ###
 import random, sys, json, datetime, re, os, unicodedata
@@ -7,7 +8,21 @@ from random import choice
 from twython import Twython, TwythonError
 from twython import TwythonStreamer
 
-### GET KEYS (LAZY FUCKING LOCAL WAY) #########################################################################
+### db stuff  ###
+import psycopg2
+import urlparse
+
+### GET KEYS  #########################################################################
+
+### heroku ###
+
+TWIT_KEY = os.environ['TWIT_KEY']
+TWIT_SECRET = os.environ['TWIT_SECRET']
+OAUTH_TOKEN = os.environ['OAUTH_TOKEN']
+OAUTH_TOKEN_SECRET = os.environ['OAUTH_TOKEN_SECRET']
+
+"""
+#local
 
 keys = []
 with open('twitter.txt','r') as my_file:
@@ -17,42 +32,83 @@ TWIT_KEY = keys[0]
 TWIT_SECRET = keys[1]
 OAUTH_TOKEN = keys[2]
 OAUTH_TOKEN_SECRET = keys[3]
+"""
 
 twitter = Twython(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
-### HORRORSCOPE STUFF ##########################################################
+### DATABASE CONNECTION ################################################################
 
-# this is just pulled right off the twython docs: https://twython.readthedocs.org/en/latest/usage/streaming_api.html
+### local setup ###
 
-class MyStreamer(TwythonStreamer):
+con = None
+try:
+	con = psycopg2.connect(database='horriblescope', user='nadinelessio')
+	cur = con.cursor() #used to go over records
+	cur.execute('SELECT version()')         # grabs the current versio  
+	ver = cur.fetchone()					#variable for that	
+	print ver 
+except psycopg2.DatabaseError, e:
+	if con:
+		con.rollback()
+	print 'Error %s' % e
+
+
+### HORRORSCOPE RESPONSE STREAM ##########################################################
+
+### NEED AN IDLE MODE ###
+
+# idle mode tweets every hour
+# just something silly
+
+### not sure if this will work on heroku as is ###
+
+class oracleStream(TwythonStreamer):
 
 	def oracleSays(self):
-		sayings = ["one", "two", "three"]
-		oneSaying = random.choice(sayings)
-		return oneSaying
+		cur.execute("SELECT * FROM Readings ORDER BY RANDOM() LIMIT 1;") 
+		rows = cur.fetchall()
+		fetchedR = rows[0][1]
+		print fetchedR
+		return fetchedR
 
-	def on_success(self, data):
+	def oracleDefers(self):
+		cur.execute("SELECT * FROM Deferrs ORDER BY RANDOM() LIMIT 1;")
+		rows = cur.fetchall()
+		fetchedD = rows[0][1]
+		print fetchedD
+		return fetchedD
+
+	def on_success(self, data): 
 
 		if 'text' in data:
-
-			body = re.sub(r'[^\w\s]','',data['text'].encode('utf-8').lower()) #sub all the punctuation
+			body = re.sub(r'[^\w\s]','',data['text'].encode('utf-8').lower()) #sub all the punctuation, make it all lower case
 			user = data['user']['screen_name'].encode('utf-8')
 
 			command = "reading"
-			sign = ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn"]
+			signs = ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn"]
 
 			if command in body:
 				reading = self.oracleSays()
-				print "body: %s from: %s read: %s" % (body, user, reading) 
-				
+				sign = '' 
+				for s in signs:
+					if s in body:
+						sign = s
+				toTweet = ".@%s: %s #%s" % (user, reading, sign)
+				try:
+					twitter.update_status(status=toTweet)
+				except TwythonError as e:
+					print e
 			else:
-				print "I do not understand what you request of me." 
-				# do nothing ? 	
-
+				defR = self.oracleDefers()
+				toNope = ".@%s: %s" % (user, defR)
+				try:
+					twitter.update_status(status=toNope)
+				except TwythonError as e:
+					print e
+					
 	def on_error(self, status_code, data):
 		#print status_code
 		pass
 
-stream = MyStreamer(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-stream.statuses.filter(track='@horrible_scope') 
-
+OrcStream = oracleStream(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+OrcStream.statuses.filter(track='@horrible_scope') 

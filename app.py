@@ -4,8 +4,6 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 
-import bot
-
 ### FLASK SETUP  ####################################################################
 app = Flask(__name__, static_folder='static',static_url_path='/static')
 app.config['DEBUG'] = True
@@ -22,7 +20,6 @@ def main():
 	# display the latest tweet or something
 	# a little about this tiny app
 	pass
-
 
 ### RUN IT ####################################################################
 

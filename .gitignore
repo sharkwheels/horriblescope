@@ -9,3 +9,6 @@ venv
 examples
 twitter.txt
 save.py
+makedb.py
+pytest.py
+
