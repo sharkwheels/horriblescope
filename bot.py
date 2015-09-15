@@ -38,15 +38,20 @@ twitter = Twython(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 ### DATABASE CONNECTION ################################################################
 
-### local setup ###
 
-con = None
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
 try:
-	con = psycopg2.connect(database='horriblescope', user='nadinelessio')
-	cur = con.cursor() #used to go over records
-	cur.execute('SELECT version()')         # grabs the current versio  
-	ver = cur.fetchone()					#variable for that	
-	print ver 
+
+	con = psycopg2.connect(
+	    database=url.path[1:],
+	    user=url.username,
+	    password=url.password,
+	    host=url.hostname,
+	    port=url.port
+	)
+	cur = con.cursor()
 except psycopg2.DatabaseError, e:
 	if con:
 		con.rollback()
