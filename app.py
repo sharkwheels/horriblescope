@@ -8,8 +8,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__, static_folder='static',static_url_path='/static')
 app.config['DEBUG'] = True
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
-app.config.from_pyfile('keys.cfg')
-app.secret_key = app.config['APP_KEY']
 
 ### APP VIEWS ####################################################################
 
@@ -19,7 +17,8 @@ def main():
 	# maybe I'll make a "X number of people served"
 	# display the latest tweet or something
 	# a little about this tiny app
-	pass
+	return render_template('main.html')
+	
 
 ### RUN IT ####################################################################
 
