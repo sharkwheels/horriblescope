@@ -5,6 +5,11 @@ import urlparse
 
 ### HORRORSCOPE IDLE (Every Hour on Scheduler) ##########################################################
 
+TWIT_KEY = os.environ['TWIT_KEY']
+TWIT_SECRET = os.environ['TWIT_SECRET']
+OAUTH_TOKEN = os.environ['OAUTH_TOKEN']
+OAUTH_TOKEN_SECRET = os.environ['OAUTH_TOKEN_SECRET']
+
 urlparse.uses_netloc.append("postgres")
 url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
