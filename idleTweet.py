@@ -31,13 +31,13 @@ try:
 	print "fetched idle status"
 	print timedR
 
-	"""
+	
 	try:
 		twitter.update_status(status=timedR)
 		print "tweeted!"
 	except TwythonError as e:
 		print e
-	"""
+	
 
 except psycopg2.DatabaseError, e:
 	if con:
