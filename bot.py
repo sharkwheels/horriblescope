@@ -57,20 +57,7 @@ except psycopg2.DatabaseError, e:
 		con.rollback()
 	print 'Error %s' % e
 
-### HORRORSCOPE IDLE (Every Hour on Scheduler) ##########################################################
 
-def timedTweet():
-	cur.execute("SELECT * FROM Idle ORDER BY RANDOM() LIMIT 1;")
-	rows = cur.fetchall()
-	timedR = rows[0][1]
-	print timedR
-	try:
-		twitter.update_status(status=timedR)
-		print timedR
-	except TwythonError as e:
-		print e
-
-	
 ### HORRORSCOPE RESPONSE STREAM ##########################################################
 
 class oracleStream(TwythonStreamer):
