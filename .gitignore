@@ -4,7 +4,6 @@
 *.log
 *.cfg
 backup
-static/images
 venv
 examples
 twitter.txt
