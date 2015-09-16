@@ -14,6 +14,8 @@ OAUTH_TOKEN_SECRET = os.environ['OAUTH_TOKEN_SECRET']
 urlparse.uses_netloc.append("postgres")
 url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
+twitter = Twython(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
 try:
 
 	con = psycopg2.connect(
