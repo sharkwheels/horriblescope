@@ -2,6 +2,7 @@ from twython import Twython, TwythonError
 ### db stuff  ###
 import psycopg2
 import urlparse
+import os
 
 ### HORRORSCOPE IDLE (Every Hour on Scheduler) ##########################################################
 
