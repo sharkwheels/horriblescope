@@ -1,4 +1,4 @@
 from twython import Twython, TwythonError
-from bot import timedTweet()
+from bot import timedTweet
 
 timedTweet()
