@@ -92,7 +92,7 @@ class oracleStream(TwythonStreamer):
 				for s in signs:
 					if s in body:
 						sign = '#%s' % s
-				toTweet = ".@%s: %s %s" % (user, reading, sign)
+				toTweet = "@%s: %s %s" % (user, reading, sign)
 				print toTweet
 				
 				try:
@@ -102,7 +102,7 @@ class oracleStream(TwythonStreamer):
 				
 			else:
 				defR = self.oracleDefers()
-				toNope = ".@%s: %s" % (user, defR)
+				toNope = "@%s: %s" % (user, defR)
 				print toNope
 				
 				try:
