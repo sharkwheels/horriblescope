@@ -80,28 +80,34 @@ class oracleStream(TwythonStreamer):
 	def on_success(self, data): 
 
 		if 'text' in data:
-			body = re.sub(r'[^\w\s]','',data['text'].encode('utf-8').lower()) #sub all the punctuation, make it all lower case
+			### get your data
+			body = data['text'].encode('utf-8')
 			user = data['user']['screen_name'].encode('utf-8')
 
+			### set your command signs and account
 			command = "reading"
 			signs = ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn"]
-			acct = '@horrible_scope'
+			acct = "@horrible_scope"
 
 			#### TWEET A READING TO A USER  ######################################
 
 			### if tweet starts with the account AND contains the word reading ###
-
 			if body.startswith(acct) and command in body:
-				###get your reading
+				### strip the text
+				bodyStrip = re.sub(r'[^\w\s]','',body.lower())
+
+				### get your reading
 				reading = self.oracleSays()
+				
+				### check which sign it is
 				sign = '' 
-				###check which sign it is
 				for s in signs:
-					if s in body:
+					if s in bodyStrip:
 						sign = '#%s' % s
 				toTweet = "@%s: %s %s" % (user, reading, sign)
 				print toTweet
-				###tweet that
+
+				### tweet back a reading
 				try:
 					twitter.update_status(status=toTweet)
 				except TwythonError as e:
@@ -112,23 +118,25 @@ class oracleStream(TwythonStreamer):
 			### else if the body starts w/ the account but has no command. 
 
 			elif body.startswith(acct) and command not in body:
+				### get a deferral
 				defR = self.oracleDefers()
 				toNope = "@%s: %s" % (user, defR)
 				print toNope
-				
+
+				### tweet the deferral
 				try:
 					twitter.update_status(status=toNope)
 				except TwythonError as e:
 					print e
+
 			### If neither of these are met....do nothing ###################
 			else:
-				pass # do nothing
+				print "neither condition was met. do nothing"
 				
 					
 	def on_error(self, status_code, data):
-		#print status_code
-		pass
+		print status_code
 
 
 OrcStream = oracleStream(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-OrcStream.statuses.filter(track='@horrible_scope') #only works if you are public
+OrcStream.statuses.filter(track="@horrible_scope") #only works if you are public
