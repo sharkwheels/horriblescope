@@ -131,4 +131,4 @@ class oracleStream(TwythonStreamer):
 
 
 OrcStream = oracleStream(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-OrcStream.statuses.filter(track=startswith('@horrible_scope')) #only works if you are public
+OrcStream.statuses.filter(track='@horrible_scope') #only works if you are public
