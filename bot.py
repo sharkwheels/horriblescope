@@ -85,22 +85,33 @@ class oracleStream(TwythonStreamer):
 
 			command = "reading"
 			signs = ["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn"]
+			acct = '@horrible_scope'
 
-			if command in body:
+			#### TWEET A READING TO A USER  ######################################
+
+			### if tweet starts with the account AND contains the word reading ###
+
+			if body.startswith(acct) and command in body:
+				###get your reading
 				reading = self.oracleSays()
 				sign = '' 
+				###check which sign it is
 				for s in signs:
 					if s in body:
 						sign = '#%s' % s
 				toTweet = "@%s: %s %s" % (user, reading, sign)
 				print toTweet
-				
+				###tweet that
 				try:
 					twitter.update_status(status=toTweet)
 				except TwythonError as e:
 					print e
-				
-			else:
+			
+			### TWEET A DEFERRAL TO A USER ##################################
+
+			### else if the body starts w/ the account but has no command. 
+
+			elif body.startswith(acct) and command not in body:
 				defR = self.oracleDefers()
 				toNope = "@%s: %s" % (user, defR)
 				print toNope
@@ -109,11 +120,15 @@ class oracleStream(TwythonStreamer):
 					twitter.update_status(status=toNope)
 				except TwythonError as e:
 					print e
+			### If neither of these are met....do nothing ###################
+			else:
+				pass # do nothing
 				
 					
 	def on_error(self, status_code, data):
 		#print status_code
 		pass
 
+
 OrcStream = oracleStream(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-OrcStream.statuses.filter(track='@horrible_scope') #only works if you are public
+OrcStream.statuses.filter(track=startswith('@horrible_scope')) #only works if you are public
