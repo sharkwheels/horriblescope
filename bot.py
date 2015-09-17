@@ -21,20 +21,8 @@ TWIT_SECRET = os.environ['TWIT_SECRET']
 OAUTH_TOKEN = os.environ['OAUTH_TOKEN']
 OAUTH_TOKEN_SECRET = os.environ['OAUTH_TOKEN_SECRET']
 
-"""
-#local
-
-keys = []
-with open('twitter.txt','r') as my_file:
-	keys = my_file.read().splitlines()
-
-TWIT_KEY = keys[0]
-TWIT_SECRET = keys[1]
-OAUTH_TOKEN = keys[2]
-OAUTH_TOKEN_SECRET = keys[3]
-"""
-
 twitter = Twython(TWIT_KEY, TWIT_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+twitter.verify_credentials()
 
 ### DATABASE CONNECTION ################################################################
 
@@ -131,7 +119,7 @@ class oracleStream(TwythonStreamer):
 
 			### If neither of these are met....do nothing ###################
 			else:
-				print "neither condition was met. do nothing"
+				print "Neither condition was met. Do nothing."
 				
 					
 	def on_error(self, status_code, data):
